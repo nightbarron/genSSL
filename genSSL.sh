@@ -1,4 +1,6 @@
 #!/bin/bash
+# author: Night Barron
+# Date: 14/06/2021
 read -p "Enter Domain: " domainName
 read -p "Enter Organization: " organName
 read -p "Enter Province: " provinceName
