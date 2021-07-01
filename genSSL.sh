@@ -3,9 +3,9 @@
 # Date: 14/06/2021
 
 createSSL() {
-    echo
-    echo "Creating Request SSL for: "
-    read -p "Enter Domain: " domainName
+    domainName=$1
+    echo "Creating Request SSL for $domainName: "
+    # read -p "Enter Domain: " domainName
     read -p "Enter Organization: " organName
     read -p "Enter Province: " provinceName
     read -p "Enter location to save ${domainName}.csr, ${domainName}.key (ENTER FOR CURRENT): " location
@@ -38,9 +38,9 @@ createSSL() {
 }
 
 checkSSL() {
-    echo 
-    echo "Checking SSL for: "
-    read -p "Enter Domain (without protocol): " domainName
+    domainName=$1
+    echo "Checking SSL for $domainName..."
+    # read -p "Enter Domain (without protocol): " domainName
     # openssl s_client -connect ${domainName}:443 # this using without protocol to check
     curl -vI https://${domainName} &> /tmp/ssl.tmp
     echo "WARNING: If nothing below, it mean no SSL certificates!"
@@ -49,24 +49,49 @@ checkSSL() {
     rm -rf /tmp/ssl.tmp
 }
 
-main() {
-    echo "Welcome to SSL Tool"
+bannerAuthor() {
+    echo "Welcome to SSL Util"
     echo "Author: Night Barron"
-    echo "Date: 16/06/2021"
+    echo "Last Modified: 01/07/2021"
     echo
-    echo "1. Create SSL Request"
-    echo "2. Check SSL for domain"
-    echo "other. Exit"
-    read -p "Enter your choice: " choice
-    if [ ${choice} -eq 1 ]
+}
+
+helpCenter() {
+    echo "NAME
+    genssl - The SSL tool for create request SSL csr/key file and checking for valid SSL in Domain.
+
+SYNOPSIS
+    genssl [options] [domain]
+
+OPTIONS
+    -n, --new=domain
+            Create new csr/key file for domain to verify.
+
+    -c, --check=domain
+            Make a checking if SSL for domain is valid or not.
+
+    -h, --help
+            Show help options for genssl tool."
+}
+
+main() {
+    option=$1
+    domain=$2
+    bannerAuthor
+    if [[ ${option} = "-n" || ${option} = "--new" ]]
     then
-        createSSL
-    elif [ ${choice} -eq 2 ]
+        createSSL $domain
+    elif [[ ${option} = "-c" || ${option} = "--check" ]]
     then
-        checkSSL
+        checkSSL $domain
+    elif [[ ${option} = "-h" || ${option} = "--help" ]]
+    then
+        helpCenter
+    else
+        echo "Invalid options! Type -h or --help to see more."
     fi
     echo "Exit!"
     exit 0
 }
 
-main
+main $1 $2
