@@ -6,8 +6,9 @@ createSSL() {
     domainName=$1
     echo "Creating Request SSL for $domainName: "
     # read -p "Enter Domain: " domainName
-    read -p "Enter Organization: " organName
-    read -p "Enter Province: " provinceName
+    read -p "Enter Company: " organName
+    read -p "Enter City: " provinceName
+    read -p "Enter Email: " emailAddress
     read -p "Enter location to save ${domainName}.csr, ${domainName}.key (ENTER FOR CURRENT): " location
 
     fileName=${domainName/"*"/"_"}
@@ -15,20 +16,22 @@ createSSL() {
     if [ ${#location} -eq 0 ]
     then
         location=$(pwd)
-    else
-        { 
-            mkdir -p $location
-        } || {
-            echo "Cannot create directory ${location}!!!"
-            exit 1
-        }
     fi
+
+    location=$location"/${fileName}"
+
+    { 
+        mkdir -p $location
+    } || {
+        echo "Cannot create directory ${location}!!!"
+        exit 1
+    }
 
     echo "Save location: ${location}"
 
     {
         openssl req -new -newkey rsa:2048 -nodes -out "${location}/${fileName}.csr" -keyout "${location}/${fileName}.key" \
-        -subj "/C=VN/ST=${provinceName}/L=${provinceName}/O=${organName}/OU=IT Department/CN=${domainName}/emailAddress=webmaster@${domainName}"
+        -subj "/C=VN/ST=${provinceName}/L=${provinceName}/O=${organName}/OU=IT Department/CN=${domainName}/emailAddress=${emailAddress}"
     } || {
         echo "Cannot create SSL at \"${location}\"!!!"
         exit 1
